@@ -1,0 +1,61 @@
+/*!
+ * Theme Name: Default
+ * Package : DashLite
+ * Author: Softnio
+ * Author URI: http://themeforest.net/user/softnio
+ * Version	 :	1.0.0
+ * Updated	 :	07.23.2020
+**/
+.loading {
+  top: 0;
+  z-index: 1000;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loading span {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  border: 3px solid transparent;
+  border-top-color: #6576ff;
+  border-bottom-color: #6576ff;
+  border-radius: 50%;
+  animation: spin ease 1000ms infinite;
+}
+.loading p {
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: normal;
+  font-size: 17px;
+}
+@keyframes spin {
+  to {
+    transform: rotateZ(360deg);
+  }
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.me-25 {
+  margin-left: 0.10rem;
+}
+.blog-image {
+  width: 100%;
+  background-color: #6576ff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.blog-image.blog-image-normal {
+  height: 175px;
+}
+.blog-image.blog-image-large {
+  height: 300px;
+}
