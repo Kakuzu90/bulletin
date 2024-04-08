@@ -28,13 +28,13 @@ export default function usePost() {
       snapshot.forEach(async (item) => {
         let college = "ALL";
         
-        if (item.data().college !== "*") {
-          const docRef = doc(db, "colleges", item.data().college);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists) {
-            college = docSnap.data().code;
-          }
-        }
+        // if (item.data().college != "*") {
+        //   const docRef = doc(db, "colleges", item.data().college);
+        //   const docSnap = await getDoc(docRef);
+        //   if (docSnap.exists) {
+        //     college = docSnap.data().code;
+        //   }
+        // }
         
         const tplt = {
           id: item.id,

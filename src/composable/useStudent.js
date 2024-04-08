@@ -1,36 +1,49 @@
-import { computed, onMounted, ref } from "vue";
-import { collection, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
+import { computed, onMounted, ref, watch } from "vue";
+import { collection, doc, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { getDownloadURL, ref as sref } from "firebase/storage";
 import male from "../assets/images/male.jpg";
 import female from "../assets/images/female.jpg";
 import background from "../assets/images/background.jpg";
+import useAuth from "./useAuth";
 
 export default function useStudent() {
   const student = ref({});
   const students = ref([]);
   const loadslip = ref(null);
 
+	const { user } = useAuth();
+
   const getStudents = async () => {
-    const colRef = collection(db, "students");
-    const colQuery = query(colRef, orderBy("college"), orderBy("name"), orderBy("gender"), orderBy("year_level"));
-    onSnapshot(colQuery, (snapshot) => {
-      students.value = [];
-      snapshot.forEach((doc) => {
-        const tplt = {
-          id: doc.id,
-          avatar: getAvatar(doc.data().gender),
-          name: doc.data().name,
-          email: doc.data().email,
-          gender: doc.data().gender,
-          college: doc.data().college,
-          year_level: doc.data().year_level,
-          student_no: doc.data().student_no,
-          verified_at: doc.data().verified_at,
-        }
-        students.value.push(tplt);
-      })
-    })
+
+		watch(user.value, function() {
+			
+			const colRef = collection(db, "students");
+			let colQuery = query(colRef, orderBy("college"), orderBy("name"), orderBy("gender"), orderBy("year_level"));
+			if (user.value.college != "*") {
+				colQuery = query(colRef, orderBy("college"), orderBy("name"), orderBy("gender"), orderBy("year_level"), where("college", "==", user.value.college));
+			}
+			onSnapshot(colQuery, (snapshot) => {
+				students.value = [];
+				snapshot.forEach((doc) => {
+					const tplt = {
+						id: doc.id,
+						avatar: getAvatar(doc.data().gender),
+						name: doc.data().name,
+						email: doc.data().email,
+						gender: doc.data().gender,
+						course: doc.data().course,
+						college: doc.data().college,
+						year_level: doc.data().year_level,
+						student_no: doc.data().student_no,
+						verified_at: doc.data().verified_at,
+					}
+					students.value.push(tplt);
+				})
+			})
+
+		})
+
   }
 
   const updateVerify = async (uid, status) => {

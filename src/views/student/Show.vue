@@ -1,7 +1,11 @@
 <script setup>
+import AppLayout from '../../components/Layouts/AppLayout.vue';
+import Show from '../../components/Student/Show.vue';
 
 </script>
 
 <template>
-  <h1>Template</h1>
+  <app-layout>
+		<show />
+	</app-layout>
 </template>

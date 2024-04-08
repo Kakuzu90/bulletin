@@ -22,6 +22,19 @@ export default function useAuth() {
     }
   });
 
+	const getUser = async () => {
+		const admin = ref({});
+		const docRef = doc(db, "admins", auth.currentUser.uid);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			admin.value.id = docSnap.id;
+			admin.value.name = docSnap.data().name;
+			admin.value.token = docSnap.data()._token;
+		}
+
+		return admin;
+	}
+
   const login = async () => {
     submit.value = true;
     loginError.value = false;
@@ -173,5 +186,6 @@ export default function useAuth() {
     update,
     clearError,
     createAccount,
+		getUser,
   }
 }

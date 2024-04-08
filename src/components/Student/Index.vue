@@ -33,6 +33,9 @@ const showStudent = (uid) => {
         <th class="nk-tb-col">
           <span class="sub-text">College</span>
         </th>
+				<th class="nk-tb-col">
+          <span class="sub-text">Course</span>
+        </th>
         <th class="nk-tb-col">
           <span class="sub-text">Year Level</span>
         </th>
@@ -71,6 +74,9 @@ const showStudent = (uid) => {
         </td>
         <td class="nk-tb-col">
           <span class="badge badge-danger badge-pill">{{ student.college }}</span>
+        </td>
+				<td class="nk-tb-col">
+          <span class="badge badge-primary badge-pill">{{ student.course }}</span>
         </td>
         <td class="nk-tb-col">
           <span>{{ student.year_level }}</span>

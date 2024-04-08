@@ -1,9 +1,14 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref, computed } from "vue";
+import { collection, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { useStore } from "vuex";
 import useDate from "../../composable/useDate";
 import usePost from "../../composable/usePost";
+import { db } from "../../firebase"
 import { useRoute } from "vue-router";
+import Comment from "../Post/Comment.vue";
+import Write from "../Post/Write.vue";
+import Modal from "../Modal.vue";
 
   const store = useStore();
   const route = useRoute();
@@ -14,9 +19,72 @@ import { useRoute } from "vue-router";
     canDelete, canRestore, canUpdatePost,
   } = usePost();
 
+	const whatType = ref(1);
+	const comments = ref([]);
+
+	const deletePost = () => {
+    whatType.value = 1;
+    $('#modalTop').modal('show')
+  }
+
+  const restorePost = () => {
+    whatType.value = 2;
+    $('#modalTop').modal('show')
+  }
+
+	const getComments = async () => {
+    const colRef = collection(db, 'comments');
+    const q = query(colRef, where('post_id', '==', params));
+    onSnapshot(q, (querySnapshot) => {
+      comments.value = [];
+      querySnapshot.forEach(async (snapshot) => {
+				if (snapshot.data().student_id) {
+					const docRef = doc(db, 'students', snapshot.data().student_id);
+					const docSnap = await getDoc(docRef);
+					if (docSnap.exists) {
+						const tplt = {
+							id: snapshot.id,
+							std: docSnap.id,
+							name: docSnap.data().name,
+							gender: docSnap.data().gender,
+							token: docSnap.data()._token,
+							is_admin: false,
+							comment: snapshot.data().comment,
+							created_at : snapshot.data().created_at,
+						};
+						comments.value.push(tplt);
+					}
+				}
+				if (snapshot.data().admin_id) {
+					const docRef = doc(db, 'admins', snapshot.data().admin_id);
+					const docSnap = await getDoc(docRef);
+					if (docSnap.exists) {
+						const tplt = {
+							id: snapshot.id,
+							std: docSnap.id,
+							name: docSnap.data().name,
+							gender: "admin",
+							token: docSnap.data()._token,
+							is_admin: true,
+							comment: snapshot.data().comment,
+							created_at : snapshot.data().created_at,
+						};
+						comments.value.push(tplt);
+					}
+				}
+        
+      })
+    })
+  }
+
+  const sortComments = computed(() => {
+    return comments.value.sort((a, b) => a.created_at - b.created_at);
+  })
+
   onMounted(async () => {
     await getPost(params);
     await getPostImage(params);
+		await getComments();
     store.dispatch("hideLoader");
   })
 </script>
@@ -81,6 +149,15 @@ import { useRoute } from "vue-router";
       <h5 class="d-flex align-items-center my-4">
         <vue-feather type="message-square" size="20" /> <span class="ml-1">Comments:</span>
       </h5>
+
+			<div class="nk-block mb-3">
+				<comment
+					v-for="comment in sortComments"
+					:key="comment.id"
+					:comment="comment" />
+			</div>
+
+			<write :reply-to="{}" ref="textarea" />
     </div>
   </div>
 </template>

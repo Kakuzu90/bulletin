@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { useStore } from "vuex";
 import banner from "../assets/images/banner-top.png";
 import useAuth from "../composable/useAuth";
-import useCollege from "../composable/useCollege";
 import { ref } from "vue";
 
 const store = useStore();
@@ -11,7 +10,6 @@ const showPassword = ref(false);
 const {
   form, errors, submit, clearError, createAccount,
 } = useAuth();
-const { vColleges } = useCollege();
 
 onMounted(() => {
   store.dispatch("hideLoader");
@@ -86,14 +84,13 @@ const togglePassword = () => showPassword.value = !showPassword.value;
                   v-model="form.college" 
                   placeholder="Select a college"
                   @change="clearError('college')"
-                >
-                  <option
-                    v-for="college in vColleges"
-                    :key="college.value"
-                    :value="college.value"
-                  >
-                    {{ college.label }}
-                  </option>
+                >             
+									<option value="CAS">CAS</option>
+									<option value="CTED">CTED</option>
+									<option value="CCJE">CCJE</option>
+									<option value="CAF">CAF</option>
+									<option value="CBA">CBA</option>
+									<option value="CIT">CIT</option>
                 </select>
               </div>
               <p class="mb-0 text-danger fs-13px" v-if="errors.college">
