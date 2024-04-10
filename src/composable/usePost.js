@@ -1,12 +1,12 @@
-import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
+import { computed, onMounted, ref, watch, watchEffect, watchSyncEffect } from "vue";
 import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import { db, storage } from "../firebase";
-import useAllToken from "./useAllToken";
 import useNotification from "./useNotification";
 import useAuth from "./useAuth";
 import background from "../assets/images/background.jpg";
 import { toast } from "vue3-toastify";
+import useAllToken from "./useAllToken";
 
 export default function usePost() {
   const post = ref({});
@@ -17,8 +17,19 @@ export default function usePost() {
   const cardBackground = ref(background);
   const image = ref(null);
   const send = useNotification();
-  const { user } = useAuth();
-  const tokens = useAllToken(user.value.college);
+	const user = ref(null)
+  const { getUser } = useAuth();
+	const { getTokens, tokens } = useAllToken();
+
+	onMounted(async () => {
+    await getPosts();
+		user.value = (await getUser()).value;
+		await getTokens(user.value.college);
+  })
+
+	watch(tokens, function(newVal, oldVal) {
+		console.log("Working...");
+	})
 
   const getPosts = async () => {
     const colRef = collection(db, "posts");
@@ -79,20 +90,21 @@ export default function usePost() {
         await uploadBytes(storageRef, form.value.file);
       }
 
-      const payload = {
-        notification : {
-          title : form.value.title,
-          body : "New Post"
-        },
-        data: {
-          postID : docRef.id
-        },
-        registration_ids: tokens.value,
-      };
-      if (tokens.value.length > 0) {
-        send(payload);
-      }
-      
+			if (tokens.value.length > 0) {
+				const payload = {
+					notification : {
+						title : form.value.title,
+						body : "New Post"
+					},
+					data: {
+						postID : docRef.id
+					},
+					registration_ids: tokens.value,
+				};
+	
+				send(payload);
+			}
+
       await addDoc(collection(db, "notifications"), {
         title: "New Post",
         body: "The administrator posted a new post with the title of " + form.value.title + ".",
@@ -219,7 +231,7 @@ export default function usePost() {
   })
 
   const canUpdatePost = computed(() => {
-    return post.value.college === user.value.college;
+    return post.value.college === user.value?.college;
   })
 
   const postTotal = computed(() => {
@@ -234,9 +246,6 @@ export default function usePost() {
     return post.value.restored_at == null && post.value.deleted_at != null && canUpdatePost.value;
   })
 
-  onMounted(async () => {
-    await getPosts();
-  })
 
   return {
     cardBackground,

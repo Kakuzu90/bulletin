@@ -30,6 +30,7 @@ export default function useAuth() {
 			admin.value.id = docSnap.id;
 			admin.value.name = docSnap.data().name;
 			admin.value.token = docSnap.data()._token;
+			admin.value.college = docSnap.data().college;
 		}
 
 		return admin;

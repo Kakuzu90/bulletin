@@ -1,16 +1,12 @@
 import { collection, onSnapshot } from "firebase/firestore";
-import { onMounted } from "vue";
 import { db } from "../firebase";
 import { ref } from "vue";
 
-export default function useAllToken(college) {
-  const tokens = ref([]);
+export default function useAllToken() {
+	const tokens = ref([]);
 
-  onMounted(() => {
-    getTokens();
-  })
-
-  const getTokens = async () => {
+  const getTokens = async (college) => {
+		tokens.value = [];
     const colRef = collection(db, "students");
     onSnapshot(colRef, (snapshots) => {
       tokens.value = [];
@@ -28,5 +24,8 @@ export default function useAllToken(college) {
     })
   }
 
-  return tokens;
+  return {
+		tokens,
+		getTokens,
+	}
 }
