@@ -90,6 +90,7 @@ import Modal from "../Modal.vue";
 </script>
 
 <template>
+	<modal :type="whatType" :uid="params" />
   <div class="nk-block">
     <RouterLink :to="{ name: 'Post' }" class="d-flex align-items-center text-dark">
       <vue-feather type="arrow-left" size="20"/>
@@ -121,7 +122,7 @@ import Modal from "../Modal.vue";
               v-if="canDelete"
               type="button"
               class="btn btn-sm btn-danger ml-1"
-             
+							@click="deletePost"
             >
               <vue-feather type="trash-2" size="14" />
               <span class="ml-1">Delete</span>
@@ -130,7 +131,7 @@ import Modal from "../Modal.vue";
               v-if="canRestore"
               type="button"
               class="btn btn-sm btn-warning ml-1"
-              
+              @click="restorePost"
             >
               <vue-feather type="refresh-ccw" size="14" />
               <span class="ml-1">Restore</span>
